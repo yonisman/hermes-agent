@@ -14,6 +14,13 @@ concurrency:
 jobs:
   test:
     name: Run tests
+    # Larger runners (the *-32-core / *-96-core labels) exist only on the
+    # upstream organisation. In a fork no runner ever carries that label, so
+    # this job sits queued forever: it never fails, never passes, and holds
+    # the CI run open -- which also starves `gh run rerun` in label-rerun.yml.
+    # Skip it there rather than let it hang: `all-checks-pass` counts a
+    # skipped job as success, so the fork's CI can still go green.
+    if: github.repository == 'NousResearch/hermes-agent'
     # One 96-core runner for the whole suite. There is no slicing. Slicing
     # existed to spread the suite over 4-core runners. It cost a matrix job, a
     # duration cache, a per-slice artifact and a merge job to do it.
