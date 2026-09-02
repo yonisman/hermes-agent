@@ -57,6 +57,10 @@ jobs:
   # Which released versions do we test updating FROM? Resolved once and shared
   # by both route matrices, so the two routes cover the same set.
   pick-releases:
+    # Only run on the upstream repository, not on forks. The matrix is built
+    # from this repo's release tags, and a fork has none of its own -- there
+    # the scheduled run only ever fails at this job, twice a day, forever.
+    if: github.repository == 'NousResearch/hermes-agent'
     name: Pick release tags
     runs-on: ubuntu-latest
     timeout-minutes: 5
