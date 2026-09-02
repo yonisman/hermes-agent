@@ -47,8 +47,13 @@ jobs:
           - name: macOS-only tests
             runner: macos-latest
             marker: macos_only
+          # windows-latest-32-core is an upstream-only larger runner: in a
+          # fork nothing carries that label and the leg would queue forever.
+          # The marker selects a small subset, so the standard runner is a
+          # fine stand-in there -- unlike the heavy Linux lanes, which are
+          # skipped outright rather than run on a quarter of the cores.
           - name: Windows-only tests
-            runner: windows-latest-32-core
+            runner: ${{ github.repository == 'NousResearch/hermes-agent' && 'windows-latest-32-core' || 'windows-latest' }}
             marker: windows_only
     steps:
       - name: Checkout code

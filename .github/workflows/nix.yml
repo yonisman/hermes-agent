@@ -49,7 +49,14 @@ jobs:
   flake-check:
     name: nix flake check
     needs: [detect]
-    if: needs.detect.outputs.nix == 'true'
+    # Larger runners (the *-32-core / *-96-core labels) exist only on the
+    # upstream organisation. In a fork no runner ever carries that label, so
+    # this job sits queued forever: it never fails, never passes, and holds
+    # the CI run open -- which also starves `gh run rerun` in label-rerun.yml.
+    # Skip it there rather than let it hang. This workflow reports its own
+    # check (it is not one of ci.yaml's `all-checks-pass` needs), and a
+    # skipped job reports green.
+    if: needs.detect.outputs.nix == 'true' && github.repository == 'NousResearch/hermes-agent'
     # The build compiles the package and its whole dependency closure, so this
     # takes minutes and not seconds when the cache misses. `nix flake check`
     # builds 21 checks, and --max-jobs defaults to the core count. It uses the

@@ -27,6 +27,13 @@ concurrency:
 jobs:
   bootstrap-installer:
     name: cargo test (bootstrap installer)
+    # Larger runners (the *-32-core / *-96-core labels) exist only on the
+    # upstream organisation. In a fork no runner ever carries that label, so
+    # this job sits queued forever: it never fails, never passes, and holds
+    # the CI run open -- which also starves `gh run rerun` in label-rerun.yml.
+    # Skip it there rather than let it hang: `all-checks-pass` counts a
+    # skipped job as success, so the fork's CI can still go green.
+    if: github.repository == 'NousResearch/hermes-agent'
     # cargo builds codegen units and test binaries in parallel across the
     # cores. This lane also builds the crate from the start when Cargo.toml
     # changes.
